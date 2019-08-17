@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for jstrube/EvtGenBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: erfAGu1IXehpzctNLQ6ZcbsSNXrUPl+CL8dizz7bT2hbj6BgN404kfpZFLeogOCyPtjlldYTgLnvgzqOyoZgnJBf2VMw+f38sdFcQrA7KmjmCeUgjsGdB6zk9vuOIIWGLNJ8VfSe46PQxPQtam1UtXJnsddXz4QgD8FhSWEOxR+aNbUN96HZeICO2vtDhCBc/2QLEUFZvXrMJUuDQAILyifEZtCu0r6z1PCHvDqJWj8MNjDD3AJpIALB0Cs6lmfc6N3oGoE8xfG5C4c1Y8C2cDXXiF9iTU6U8OSV8EZktpjJ2GhPjGv+RZ+I+0F3Sq0gf04pxOXxiSZuHGGmfM6mc2wOf3Zj6oYkSF37zFsBiuJ4QzPhgIDvrjYzOUQv+4Z5XhRP/6MESBJeJfuap0zLoD1uKlTtc7Sl7DNKCLwX6v9jq+KvNago7KCyGUo7HoXFt3Mhe/dT1065E6QMrKtNdKpKAlJTX2CGKOXyilIOsKwpeT8AAewJZ5fBZNuE/hVQERn7nKrmObUxt7TqKoYLIEwUPGB5A0mNz05puX/vn29YXpdMIZoYi3zayJv5XA7Pe89ZODmtXK/BmIpIF8BLxnjl3T4wkPejY6GYDedOoO1acqWXcblO4472tyTAtE2CcUABSB1fbsmYit84MXkfYswC5jlwrqYGW/05q9zoCHU=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: jstrube/EvtGenBuilder
+        tags: true
